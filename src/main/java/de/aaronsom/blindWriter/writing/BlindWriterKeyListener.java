@@ -43,26 +43,35 @@ public class BlindWriterKeyListener implements KeyListener{
     }
 
     /**
-     * Check if a key is selected and if the pressed key matches the last pressed key.
-     * If this is the case, the pressed key will be appended to the text area
-     * and the state is reset to WrintingState.NONE,
-     * otherwise the state is set to WritingState.SELECTED and last pressed key is updated
+     * Check if a key was selected and if the typed key matches the last typed key.
+     * If this is the case, the typed key will be appended to the text area or if the
+     * pressed key was Backspace, removes the last character of the text area.
+     * Afterwards the state is reset to WrintingState.NONE
+     *
+     * If no key was selected and if the pressed key results in a valid Unicode character,
+     * the state is set to WritingState.SELECTED and the last typed key is updated
+     *
+     * Consumes the {@link KeyEvent} so that the text area does not use it.
      * @param e the {@link KeyEvent} that occurred
      */
     public void keyPressed(KeyEvent e) {
         if(writingState == WritingState.SELECTED && lastKeyPress == e.getKeyCode()){
-            SwingUtilities.invokeLater(new AppendAction(String.valueOf(e.getKeyChar())));
+            if (e.getKeyCode() == KeyEvent.VK_BACK_SPACE) {
+                SwingUtilities.invokeLater(new RemoveAction());
+            } else {
+                SwingUtilities.invokeLater(new AppendAction(String.valueOf(e.getKeyChar())));
+            }
             writingState = WritingState.NONE;
-        } else {
+        } else if(e.getKeyChar() != KeyEvent.CHAR_UNDEFINED){
             lastKeyPress = e.getKeyCode();
             writingState = WritingState.SELECTED;
         }
+        e.consume();
     }
 
     public void keyReleased(KeyEvent e) {
         //do nothing
     }
-
 
     /**
      * Runnable to append a String to the end of the JTextArea textArea
@@ -81,8 +90,23 @@ public class BlindWriterKeyListener implements KeyListener{
         /**
          * Appends the String to the end of textArea.
          */
+        @Override
         public void run() {
             textArea.append(toAppend);
+        }
+    }
+
+    /**
+     * Runnable to remove the last character of the textArea
+     */
+    private class RemoveAction implements Runnable{
+
+        /**
+         * Removes the last character of textArea
+         */
+        @Override
+        public void run() {
+            textArea.replaceRange("",textArea.getDocument().getLength()-1, textArea.getDocument().getLength());
         }
     }
 }
