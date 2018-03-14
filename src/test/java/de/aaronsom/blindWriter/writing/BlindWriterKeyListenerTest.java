@@ -1,5 +1,6 @@
 package de.aaronsom.blindWriter.writing;
 
+import de.aaronsom.blindWriter.file.FileSaver;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -9,17 +10,24 @@ import java.awt.event.KeyEvent;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 
 
 class BlindWriterKeyListenerTest {
 
     JTextArea testTextArea;
     BlindWriterKeyListener blindWriterKeyListener;
+    FileSaver fileSaver;
 
     @BeforeEach
     void init(){
         testTextArea = new JTextArea();
-        blindWriterKeyListener = new BlindWriterKeyListener(testTextArea);
+        fileSaver = mock(FileSaver.class);
+        blindWriterKeyListener = new BlindWriterKeyListener(testTextArea, fileSaver);
     }
 
     @Test
@@ -43,7 +51,8 @@ class BlindWriterKeyListenerTest {
 
         Thread.sleep(100);
         assertEquals("", testTextArea.getText(), "Pressing 'a' and 'b' results in no text");
-
+        verify(fileSaver, never()).append(anyString());
+        verify(fileSaver, never()).remove(anyInt());
     }
 
     @Test
@@ -54,6 +63,7 @@ class BlindWriterKeyListenerTest {
         blindWriterKeyListener.keyPressed(keyEventA);
         Thread.sleep(100);
         assertEquals("a", testTextArea.getText(), "Pressing 'a' twice results in 'a'");
+        verify(fileSaver).append("a");
     }
 
     @Test
@@ -65,6 +75,7 @@ class BlindWriterKeyListenerTest {
         blindWriterKeyListener.keyPressed(keyEventEnter);
         Thread.sleep(100);
         assertEquals(lineCount+1, testTextArea.getLineCount(), "Pressing Enter twice results in a new line");
+        verify(fileSaver).append("\n");
     }
 
     @Test
@@ -75,6 +86,7 @@ class BlindWriterKeyListenerTest {
         blindWriterKeyListener.keyPressed(keyEventSpace);
         Thread.sleep(100);
         assertEquals(" ", testTextArea.getText(), "Pressing Space twice results in ' '");
+        verify(fileSaver).append(" ");
     }
 
     @Test
@@ -86,6 +98,7 @@ class BlindWriterKeyListenerTest {
         blindWriterKeyListener.keyPressed(keyEventBackspace);
         Thread.sleep(100);
         assertEquals("a", testTextArea.getText(), "Pressing Backspace twice removes one character");
+        verify(fileSaver).remove(1);
     }
 
     @Test

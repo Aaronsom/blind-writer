@@ -1,5 +1,7 @@
 package de.aaronsom.blindWriter.writing;
 
+import de.aaronsom.blindWriter.file.FileSaver;
+
 import javax.swing.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -11,6 +13,10 @@ import java.awt.event.KeyListener;
  * When this happens, this class appends the KeyChar of the event to the text area.
  */
 public class BlindWriterKeyListener implements KeyListener{
+    /**
+     * The FileSaver that keeps track of all changes
+     */
+    private FileSaver fileSaver;
     /**
      * The JTextArea into which is written by this
      */
@@ -25,11 +31,13 @@ public class BlindWriterKeyListener implements KeyListener{
     private int lastKeyPress;
 
     /**
-     * Constructs a new {@link BlindWriterKeyListener} for a {@link JTextArea}.
-     * @param textArea the {@link JTextArea} for which to supervise the key presses.
+     * Constructs a new {@link BlindWriterKeyListener} for a {@link JTextArea} with a {@link FileSaver}
+     * @param textArea the {@link JTextArea} for which to supervise the key presses
+     * @param fileSaver the {@link FileSaver} that keeps track of the changes
      */
-    public BlindWriterKeyListener(JTextArea textArea){
+    public BlindWriterKeyListener(JTextArea textArea, FileSaver fileSaver){
         this.textArea = textArea;
+        this.fileSaver = fileSaver;
         writingState = WritingState.NONE;
         lastKeyPress = 0;
     }
@@ -44,8 +52,8 @@ public class BlindWriterKeyListener implements KeyListener{
 
     /**
      * Check if a key was selected and if the typed key matches the last typed key.
-     * If this is the case, the typed key will be appended to the text area or if the
-     * pressed key was Backspace, removes the last character of the text area.
+     * If this is the case, the typed key will be appended to textArea and fileSaver or if the
+     * pressed key was Backspace, removes the last character of textArea and fileSaver.
      * Afterwards the state is reset to WrintingState.NONE
      *
      * If no key was selected and if the pressed key results in a valid Unicode character,
@@ -80,7 +88,7 @@ public class BlindWriterKeyListener implements KeyListener{
         String toAppend;
 
         /**
-         * Constructs a new AppendAction with the String to append to textArea.
+         * Constructs a new AppendAction with the String to append to textArea and fileSaver
          * @param toAppend the String to append to textArea
          */
         AppendAction(String toAppend) {
@@ -88,25 +96,27 @@ public class BlindWriterKeyListener implements KeyListener{
         }
 
         /**
-         * Appends the String to the end of textArea.
+         * Appends the String to the end of textArea and fileSaver
          */
         @Override
         public void run() {
             textArea.append(toAppend);
+            fileSaver.append(toAppend);
         }
     }
 
     /**
-     * Runnable to remove the last character of the textArea
+     * Runnable to remove the last character of the textArea and fileSaver
      */
     private class RemoveAction implements Runnable{
 
         /**
-         * Removes the last character of textArea
+         * Removes the last character of textArea and fileSaver
          */
         @Override
         public void run() {
             textArea.replaceRange("",textArea.getDocument().getLength()-1, textArea.getDocument().getLength());
+            fileSaver.remove(1);
         }
     }
 }
