@@ -83,12 +83,20 @@ public class BlindWriterKeyListener implements KeyListener{
             lastKeyPress = e.getKeyCode();
             writingState = WritingState.SELECTED;
         }
-        soundManager.play(String.valueOf(e.getKeyChar()));
+        triggerSoundManager(String.valueOf(e.getKeyChar()));
         e.consume();
     }
 
     public void keyReleased(KeyEvent e) {
         //do nothing
+    }
+
+    /**
+     * Makes soundManger play a sound for the pressed key
+     * @param key the key for which a sound is to be played
+     */
+    private void triggerSoundManager(String key){
+        soundManager.play(key);
     }
 
     /**
@@ -116,7 +124,7 @@ public class BlindWriterKeyListener implements KeyListener{
     }
 
     /**
-     * Runnable to remove the last character of the textArea and fileSaver
+     * Runnable to remove the last character of textArea and fileSaver
      */
     private class RemoveAction implements Runnable{
 
@@ -125,7 +133,8 @@ public class BlindWriterKeyListener implements KeyListener{
          */
         @Override
         public void run() {
-            textArea.replaceRange("",textArea.getDocument().getLength()-1, textArea.getDocument().getLength());
+            int documentLength = textArea.getDocument().getLength();
+            textArea.replaceRange("",documentLength-1, documentLength);
             fileSaver.remove(1);
         }
     }

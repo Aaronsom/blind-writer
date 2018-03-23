@@ -8,6 +8,10 @@ import de.aaronsom.blindWriter.writing.BlindWriterKeyListener;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -58,26 +62,11 @@ public class MainGUI extends JFrame{
         contentPane.add(toolBar, BorderLayout.PAGE_START);
 
         openFileButton = new JButton("Dokument öffnen");
-        openFileButton.addActionListener(e -> {
-            JFileChooser chooser = new JFileChooser();
-            FileNameExtensionFilter extensionFilter = new FileNameExtensionFilter(
-                    "txt Dokumente", "txt");
-            chooser.setFileFilter(extensionFilter);
-            int chooseResult = chooser.showOpenDialog(MainGUI.this);
-            if(chooseResult == JFileChooser.APPROVE_OPTION){
-                File file = chooser.getSelectedFile();
-                fileSaver = new TxtFileSaver(file);
-                setupDocumentTextArea(file);
-            }
-        });
+        openFileButton.addActionListener(this::openDocumentAction);
         toolBar.add(openFileButton);
 
         saveFileButton = new JButton("Speichern");
-        saveFileButton.addActionListener(e -> {
-            if(fileSaver != null){
-                fileSaver.save();
-            }
-        });
+        saveFileButton.addActionListener(this::saveDocumentAction);
         toolBar.add(saveFileButton);
     }
 
@@ -118,13 +107,57 @@ public class MainGUI extends JFrame{
 
     /**
      * Sets up the window.
+     * Adds a WindowListener that asks for confirmation if unsaved changes would get lost by closing.
      * Sets the size of the window to the maximum screen size and makes the window visible.
      */
     private void setupWindow(){
         setMaximumSize(Toolkit.getDefaultToolkit().getScreenSize());
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                if(fileSaver.hasUnsavedChanges()){
+
+                    int confirmResult = JOptionPane.showConfirmDialog(MainGUI.this,
+                                                                      "Änderungen sind noch nicht gespeichert und gehen beim Schließen verloren. Wirklich schließen?",
+                                                                      "Wirklich schließen?", JOptionPane.YES_NO_OPTION);
+                    if(confirmResult == JOptionPane.YES_OPTION){
+                        System.exit(0);
+                    }
+                } else {
+                    System.exit(0);
+                }
+            }
+
+        });
+        setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         setExtendedState(MAXIMIZED_BOTH);
         setVisible(true);
+    }
+
+    /**
+     * When triggered, a file selection dialog is created and documentTextArea is set up with the file.
+     * @param e
+     */
+    private void openDocumentAction(ActionEvent e) {
+        JFileChooser chooser = new JFileChooser();
+        FileNameExtensionFilter extensionFilter = new FileNameExtensionFilter(
+                "txt Dokumente", "txt");
+        chooser.setFileFilter(extensionFilter);
+        int chooseResult = chooser.showOpenDialog(MainGUI.this);
+        if (chooseResult == JFileChooser.APPROVE_OPTION) {
+            File file = chooser.getSelectedFile();
+            fileSaver = new TxtFileSaver(file);
+            setupDocumentTextArea(file);
+        }
+    }
+
+    /**
+     * When triggered, changes to the open file are saved
+     */
+    private void saveDocumentAction(ActionEvent e) {
+        if (fileSaver != null) {
+            fileSaver.save();
+        }
     }
 }
 
