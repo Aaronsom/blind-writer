@@ -1,6 +1,7 @@
 package de.aaronsom.blindWriter.writing;
 
 import de.aaronsom.blindWriter.file.FileSaver;
+import de.aaronsom.blindWriter.sound.SoundManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -22,12 +23,13 @@ class BlindWriterKeyListenerTest {
     JTextArea testTextArea;
     BlindWriterKeyListener blindWriterKeyListener;
     FileSaver fileSaver;
-
+    SoundManager soundManager;
     @BeforeEach
     void init(){
         testTextArea = new JTextArea();
         fileSaver = mock(FileSaver.class);
-        blindWriterKeyListener = new BlindWriterKeyListener(testTextArea, fileSaver);
+        soundManager = mock(SoundManager.class);
+        blindWriterKeyListener = new BlindWriterKeyListener(testTextArea, fileSaver, soundManager);
     }
 
     @Test
@@ -109,6 +111,14 @@ class BlindWriterKeyListenerTest {
         blindWriterKeyListener.keyPressed(keyEventControle);
         Thread.sleep(100);
         assertEquals("", testTextArea.getText(), "KeyEvent.CHAR_UNDEFINED is ignored even if pressed twice");
+    }
+
+    @Test
+    void keyPressedTriggersSoundManager(){
+        KeyEvent keyEvent= new KeyEvent(
+                testTextArea, KeyEvent.KEY_PRESSED, 0, 0, KeyEvent.VK_CONTROL, 'a');
+        blindWriterKeyListener.keyPressed(keyEvent);
+        verify(soundManager).play("a");
     }
 
     @Test

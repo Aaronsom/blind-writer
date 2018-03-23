@@ -1,6 +1,7 @@
 package de.aaronsom.blindWriter.writing;
 
 import de.aaronsom.blindWriter.file.FileSaver;
+import de.aaronsom.blindWriter.sound.SoundManager;
 
 import javax.swing.*;
 import java.awt.event.KeyEvent;
@@ -18,6 +19,10 @@ public class BlindWriterKeyListener implements KeyListener{
      */
     private FileSaver fileSaver;
     /**
+     * The SoundManager that plays a sound for the key presses
+     */
+    private SoundManager soundManager;
+    /**
      * The JTextArea into which is written by this
      */
     private JTextArea textArea;
@@ -34,10 +39,12 @@ public class BlindWriterKeyListener implements KeyListener{
      * Constructs a new {@link BlindWriterKeyListener} for a {@link JTextArea} with a {@link FileSaver}
      * @param textArea the {@link JTextArea} for which to supervise the key presses
      * @param fileSaver the {@link FileSaver} that keeps track of the changes
+     * @param soundManager the {@link SoundManager} that plays a sound for the key presses
      */
-    public BlindWriterKeyListener(JTextArea textArea, FileSaver fileSaver){
+    public BlindWriterKeyListener(JTextArea textArea, FileSaver fileSaver, SoundManager soundManager){
         this.textArea = textArea;
         this.fileSaver = fileSaver;
+        this.soundManager = soundManager;
         writingState = WritingState.NONE;
         lastKeyPress = 0;
     }
@@ -59,6 +66,8 @@ public class BlindWriterKeyListener implements KeyListener{
      * If no key was selected and if the pressed key results in a valid Unicode character,
      * the state is set to WritingState.SELECTED and the last typed key is updated
      *
+     * Makes soundManager play a sound according to the key pressed.
+     *
      * Consumes the {@link KeyEvent} so that the text area does not use it.
      * @param e the {@link KeyEvent} that occurred
      */
@@ -74,6 +83,7 @@ public class BlindWriterKeyListener implements KeyListener{
             lastKeyPress = e.getKeyCode();
             writingState = WritingState.SELECTED;
         }
+        soundManager.play(String.valueOf(e.getKeyChar()));
         e.consume();
     }
 

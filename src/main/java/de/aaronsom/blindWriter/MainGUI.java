@@ -2,6 +2,7 @@ package de.aaronsom.blindWriter;
 
 import de.aaronsom.blindWriter.file.FileSaver;
 import de.aaronsom.blindWriter.file.TxtFileSaver;
+import de.aaronsom.blindWriter.sound.SoundManager;
 import de.aaronsom.blindWriter.writing.BlindWriterKeyListener;
 
 import javax.swing.*;
@@ -24,6 +25,7 @@ public class MainGUI extends JFrame{
     private JButton openFileButton;
     private JButton saveFileButton;
 
+    private SoundManager soundManager;
     private FileSaver fileSaver;
     /**
      * Constructs the main window and the toolbar
@@ -31,6 +33,8 @@ public class MainGUI extends JFrame{
     public MainGUI(){
         contentPane = getContentPane();
         contentPane.setLayout(new BorderLayout());
+
+        soundManager = new SoundManager();
 
         setupToolbar();
 
@@ -80,22 +84,22 @@ public class MainGUI extends JFrame{
     /**
      * Sets up documentTextArea for the selected file.
      * Enables line wrap by words and adds the {@link BlindWriterKeyListener} to it.
-     * AAt the end, the JScrollPane for the text area is set up
+     * At the end, the JScrollPane for the text area is set up
      * @param file the file on which the text area is based and for which changes are stored
      */
     private void setupDocumentTextArea(File file){
         documentTextArea = new JTextArea();
         documentTextArea.setLineWrap(true);
         documentTextArea.setWrapStyleWord(true);
-        documentTextArea.addKeyListener(new BlindWriterKeyListener(documentTextArea, fileSaver));
+        documentTextArea.addKeyListener(new BlindWriterKeyListener(documentTextArea, fileSaver, soundManager));
         try(BufferedReader reader = new BufferedReader(new FileReader(file))){
             String line;
             while (true){
                 line = reader.readLine();
-                reader.
                 if(line != null) documentTextArea.append(line+"\n");
                 else break;
-            }}catch(IOException ioException){
+            }
+        }catch(IOException ioException){
             ioException.printStackTrace();
         }
         setupScollPane();
