@@ -1,6 +1,5 @@
 package de.aaronsom.blindWriter.sound;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -36,26 +35,26 @@ public class SoundManager {
      */
     public SoundManager(){
         inputKeyToSoundMapping = new HashMap<>();
-        defaultPlayer = new SoundPlayer(getMP3ByName("default"));
+        defaultPlayer = new SoundPlayer(makePathToMP3("default"));
 
         //backspace
-        inputKeyToSoundMapping.put("\u0008", new SoundPlayer(getMP3ByName("loeschen")));
+        inputKeyToSoundMapping.put("\u0008", new SoundPlayer(makePathToMP3("loeschen")));
         //enter
-        inputKeyToSoundMapping.put("\n", new SoundPlayer(getMP3ByName("zeilenumbruch")));
+        inputKeyToSoundMapping.put("\n", new SoundPlayer(makePathToMP3("zeilenumbruch")));
         //space
-        inputKeyToSoundMapping.put("\u0020", new SoundPlayer(getMP3ByName("leerzeichen")));
+        inputKeyToSoundMapping.put("\u0020", new SoundPlayer(makePathToMP3("leerzeichen")));
         //dot and comma
-        inputKeyToSoundMapping.put(".", new SoundPlayer(getMP3ByName("punkt")));
-        inputKeyToSoundMapping.put(",", new SoundPlayer(getMP3ByName("komma")));
+        inputKeyToSoundMapping.put(".", new SoundPlayer(makePathToMP3("punkt")));
+        inputKeyToSoundMapping.put(",", new SoundPlayer(makePathToMP3("komma")));
         //umlaute
-        inputKeyToSoundMapping.put("ä", new SoundPlayer(getMP3ByName("ae")));
-        inputKeyToSoundMapping.put("ö", new SoundPlayer(getMP3ByName("oe")));
-        inputKeyToSoundMapping.put("ü", new SoundPlayer(getMP3ByName("ue")));
+        inputKeyToSoundMapping.put("ä", new SoundPlayer(makePathToMP3("ae")));
+        inputKeyToSoundMapping.put("ö", new SoundPlayer(makePathToMP3("oe")));
+        inputKeyToSoundMapping.put("ü", new SoundPlayer(makePathToMP3("ue")));
         //alphabet
         String alphabet = "abcdefghijklmnopqrstuvwxyz";
         for(int i = 0; i<26; i++){
             String letter = String.valueOf(alphabet.charAt(i));
-            inputKeyToSoundMapping.put(letter, new SoundPlayer(getMP3ByName(letter)));
+            inputKeyToSoundMapping.put(letter, new SoundPlayer(makePathToMP3(letter)));
         }
     }
 
@@ -74,12 +73,11 @@ public class SoundManager {
     }
 
     /**
-     * Tries to find and return the file /de.aaronsom.blindWriter.sound/<name>.mp3.
-     * If no file with the name can be found, a NullPointerException will be thrown.
+     * Creates the path to the MP3 file by concatenation of the base URL, the name and the file extension.
      * @param name the name of the file
-     * @return the {@link File} for /de.aaronsom.blindWriter.sound/<name>.mp3
+     * @return the the String "/de.aaronsom.blindWriter.sound/<name>.mp3"
      */
-    private File getMP3ByName(String name){
-        return new File(getClass().getResource(baseURL+name+".mp3").getFile());
+    private String makePathToMP3(String name){
+        return baseURL+name+".mp3";
     }
 }

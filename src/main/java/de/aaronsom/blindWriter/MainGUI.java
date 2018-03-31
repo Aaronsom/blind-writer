@@ -4,6 +4,8 @@ import de.aaronsom.blindWriter.file.FileSaver;
 import de.aaronsom.blindWriter.file.TxtFileSaver;
 import de.aaronsom.blindWriter.sound.SoundManager;
 import de.aaronsom.blindWriter.writing.BlindWriterKeyListener;
+import org.odftoolkit.simple.TextDocument;
+import org.odftoolkit.simple.text.Paragraph;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -11,7 +13,6 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -81,6 +82,7 @@ public class MainGUI extends JFrame{
         documentTextArea.setLineWrap(true);
         documentTextArea.setWrapStyleWord(true);
         documentTextArea.addKeyListener(new BlindWriterKeyListener(documentTextArea, fileSaver, soundManager));
+
         try(BufferedReader reader = new BufferedReader(new FileReader(file))){
             String line;
             while (true){
@@ -115,7 +117,7 @@ public class MainGUI extends JFrame{
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
-                if(fileSaver.hasUnsavedChanges()){
+                if(fileSaver != null && fileSaver.hasUnsavedChanges()){
 
                     int confirmResult = JOptionPane.showConfirmDialog(MainGUI.this,
                                                                       "Änderungen sind noch nicht gespeichert und gehen beim Schließen verloren. Wirklich schließen?",
