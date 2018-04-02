@@ -6,6 +6,8 @@ import de.aaronsom.blindWriter.sound.SoundManager;
 import javax.swing.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A {@link KeyListener} for a {@link JTextArea}
@@ -34,6 +36,10 @@ public class BlindWriterKeyListener implements KeyListener{
      * The KeyCode of the last KeyEvent that occured
      */
     private int lastKeyPress;
+    /**
+     * A list of all currently held down keys
+     */
+    private List<Integer> heldDownKeys;
 
     /**
      * Constructs a new {@link BlindWriterKeyListener} for a {@link JTextArea} with a {@link FileSaver}
@@ -46,7 +52,8 @@ public class BlindWriterKeyListener implements KeyListener{
         this.fileSaver = fileSaver;
         this.soundManager = soundManager;
         writingState = WritingState.NONE;
-        lastKeyPress = 0;
+        lastKeyPress = -1;
+        heldDownKeys = new ArrayList<>();
     }
 
     /**
@@ -68,27 +75,37 @@ public class BlindWriterKeyListener implements KeyListener{
      *
      * Makes soundManager play a sound according to the key pressed.
      *
+     * The above does happen for a key only once while it is held down. So all key pressed events for the key
+     * are ignored while it is on the heldDownKeys list.
      * Consumes the {@link KeyEvent} so that the text area does not use it.
      * @param e the {@link KeyEvent} that occurred
      */
     public void keyPressed(KeyEvent e) {
-        if(writingState == WritingState.SELECTED && lastKeyPress == e.getKeyCode()){
-            if (e.getKeyCode() == KeyEvent.VK_BACK_SPACE) {
-                SwingUtilities.invokeLater(new RemoveAction());
-            } else {
-                SwingUtilities.invokeLater(new AppendAction(String.valueOf(e.getKeyChar())));
+        int pressedKeyCode = e.getKeyCode();
+        char pressedKeyChar = e.getKeyChar();
+        if (!heldDownKeys.contains(pressedKeyCode)) {
+            if(writingState == WritingState.SELECTED && lastKeyPress == pressedKeyCode){
+                if (pressedKeyCode == KeyEvent.VK_BACK_SPACE) {
+                    SwingUtilities.invokeLater(new RemoveAction());
+                } else {
+                    SwingUtilities.invokeLater(new AppendAction(String.valueOf(pressedKeyChar)));
+                }
+                writingState = WritingState.NONE;
+            } else if(pressedKeyChar != KeyEvent.CHAR_UNDEFINED){
+                lastKeyPress = pressedKeyCode;
+                writingState = WritingState.SELECTED;
             }
-            writingState = WritingState.NONE;
-        } else if(e.getKeyChar() != KeyEvent.CHAR_UNDEFINED){
-            lastKeyPress = e.getKeyCode();
-            writingState = WritingState.SELECTED;
+            heldDownKeys.add(pressedKeyCode);
+            triggerSoundManager(String.valueOf(pressedKeyChar));
         }
-        triggerSoundManager(String.valueOf(e.getKeyChar()));
         e.consume();
     }
 
+    /**
+     * Removes the key from the heldDownKeys list
+     */
     public void keyReleased(KeyEvent e) {
-        //do nothing
+        heldDownKeys.remove(new Integer(e.getKeyCode()));
     }
 
     /**

@@ -38,6 +38,7 @@ public class MainGUI extends JFrame{
     public MainGUI(){
         contentPane = getContentPane();
         contentPane.setLayout(new BorderLayout());
+        WindowsKeyHook.blockWindowsKey();
 
         soundManager = new SoundManager();
 
@@ -117,15 +118,18 @@ public class MainGUI extends JFrame{
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
+                boolean close = true;
                 if(fileSaver != null && fileSaver.hasUnsavedChanges()){
 
                     int confirmResult = JOptionPane.showConfirmDialog(MainGUI.this,
                                                                       "Änderungen sind noch nicht gespeichert und gehen beim Schließen verloren. Wirklich schließen?",
                                                                       "Wirklich schließen?", JOptionPane.YES_NO_OPTION);
-                    if(confirmResult == JOptionPane.YES_OPTION){
-                        System.exit(0);
+                    if(confirmResult == JOptionPane.NO_OPTION){
+                        close = false;
                     }
-                } else {
+                }
+                if(close){
+                    WindowsKeyHook.unblockWindowsKey();
                     System.exit(0);
                 }
             }
