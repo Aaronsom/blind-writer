@@ -37,24 +37,29 @@ public class SoundManager {
         inputKeyToSoundMapping = new HashMap<>();
         defaultPlayer = new SoundPlayer(makePathToMP3("default"));
 
-        //backspace
         inputKeyToSoundMapping.put("\u0008", new SoundPlayer(makePathToMP3("loeschen")));
-        //enter
+        inputKeyToSoundMapping.put("\u0009", new SoundPlayer(makePathToMP3("tabulator")));
+        inputKeyToSoundMapping.put("\u001b", new SoundPlayer(makePathToMP3("escape")));
         inputKeyToSoundMapping.put("\n", new SoundPlayer(makePathToMP3("zeilenumbruch")));
-        //space
         inputKeyToSoundMapping.put("\u0020", new SoundPlayer(makePathToMP3("leerzeichen")));
-        //dot and comma
         inputKeyToSoundMapping.put(".", new SoundPlayer(makePathToMP3("punkt")));
         inputKeyToSoundMapping.put(",", new SoundPlayer(makePathToMP3("komma")));
-        //umlaute
+        inputKeyToSoundMapping.put("+", new SoundPlayer(makePathToMP3("plus")));
+        inputKeyToSoundMapping.put("-", new SoundPlayer(makePathToMP3("strich")));
         inputKeyToSoundMapping.put("ä", new SoundPlayer(makePathToMP3("ae")));
         inputKeyToSoundMapping.put("ö", new SoundPlayer(makePathToMP3("oe")));
         inputKeyToSoundMapping.put("ü", new SoundPlayer(makePathToMP3("ue")));
+        inputKeyToSoundMapping.put("ß", new SoundPlayer(makePathToMP3("scharfes_s")));
         //alphabet
         String alphabet = "abcdefghijklmnopqrstuvwxyz";
         for(int i = 0; i<26; i++){
             String letter = String.valueOf(alphabet.charAt(i));
             inputKeyToSoundMapping.put(letter, new SoundPlayer(makePathToMP3(letter)));
+        }
+        //numbers
+        for(int i = 0; i<=9; i++){
+            String number = String.valueOf(i);
+            inputKeyToSoundMapping.put(number, new SoundPlayer((makePathToMP3(number))));
         }
     }
 

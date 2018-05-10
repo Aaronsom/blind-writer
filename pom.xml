@@ -6,7 +6,7 @@
 
     <groupId>de.aaronsom.blind-writer</groupId>
     <artifactId>blind-writer</artifactId>
-    <version>0.1</version>
+    <version>0.3</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -71,8 +71,6 @@
                         <artifactId>junit-platform-surefire-provider</artifactId>
                         <version>${junit.platform.version}</version>
                     </dependency>
-
-
                 </dependencies>
             </plugin>
         </plugins>
@@ -93,11 +91,6 @@
             <groupId>com.googlecode.soundlibs</groupId>
             <artifactId>jlayer</artifactId>
             <version>1.0.1-1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.odftoolkit</groupId>
-            <artifactId>simple-odf</artifactId>
-            <version>0.8.2-incubating</version>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
